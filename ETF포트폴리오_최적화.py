@@ -137,12 +137,12 @@ def compute_daily_beta_1y(sym_code, market_code):
 
         end_date = datetime.today()
         start_date = end_date - pd.DateOffset(years=1)
-        print(f"📅 기간: {start_date.date()} ~ {end_date.date()}")
+        print(f" 기간: {start_date.date()} ~ {end_date.date()}")
 
         # DataFrame으로 명시적 다운로드
         stock_df = yf.download(sym_code, start=start_date, end=end_date, interval='1d')[['Close']]
         market_df = yf.download(market_code, start=start_date, end=end_date, interval='1d')[['Close']]
-        print("📥 다운로드 완료")
+        print(" 다운로드 완료")
 
         # 열 이름 명시적 변경
         stock_df = stock_df.rename(columns={'Close': 'stock'})
@@ -150,27 +150,27 @@ def compute_daily_beta_1y(sym_code, market_code):
 
         # 날짜 기준 병합
         merged = pd.merge(stock_df, market_df, left_index=True, right_index=True).dropna()
-        print("📊 병합 후 데이터 수:", len(merged))
+        print(" 병합 후 데이터 수:", len(merged))
 
         if len(merged) < 30:
-            print(f"⚠️ 데이터 너무 짧음 ({len(merged)}일)")
+            print(f" 데이터 너무 짧음 ({len(merged)}일)")
             return None
 
         # 로그 수익률 계산
         merged['stock_ret'] = np.log(merged['stock'] / merged['stock'].shift(1))
         merged['market_ret'] = np.log(merged['market'] / merged['market'].shift(1))
         merged = merged.dropna()
-        print(f"✅ 수익률 계산 완료. 관측치 수: {len(merged)}")
+        print(f" 수익률 계산 완료. 관측치 수: {len(merged)}")
 
         # numpy로 변환 후 베타 계산
         x = merged['market_ret'].to_numpy()
         y = merged['stock_ret'].to_numpy()
         beta = np.cov(y, x)[0, 1] / np.var(x)
-        print(f"✅ 최종 베타: β = {beta:.4f}")
+        print(f" 최종 베타: β = {beta:.4f}")
         return beta
 
     except Exception as e:
-        print(f"💥 {sym_code} 베타 계산 실패: {e}")
+        print(f" {sym_code} 베타 계산 실패: {e}")
         return None
 
 
@@ -281,7 +281,7 @@ merged_dict = {}
 etf_returns = {}
 
 for etf_code in etf_list:
-    print(f"\n📦 ETF {etf_code} 처리 시작")
+    print(f"\n ETF {etf_code} 처리 시작")
 
     try:
         # 1. ETF 구성 정보 불러오기
@@ -366,10 +366,10 @@ for etf_code in etf_list:
 
         # 결과 저장
         merged_dict[etf_code] = merged
-        print(f"✅ ETF {etf_code} 기대수익률: {etf_r:.4%}")
+        print(f" ETF {etf_code} 기대수익률: {etf_r:.4%}")
 
     except Exception as e:
-        print(f"💥 ETF {etf_code} 처리 실패: {e}")
+        print(f" ETF {etf_code} 처리 실패: {e}")
 
 
 
@@ -401,7 +401,7 @@ def optimize_weights(mu, cov, objective='sharpe', ridge=1e-3, sum_to_one=True):
 
     bounds = [(0, 1)] * N if sum_to_one else [(0, None)] * N
 
-    # ✅ 비중합 = 1 제약 여부
+    #  비중합 = 1 제약 여부
     if sum_to_one:
         cons = ({'type': 'eq', 'fun': lambda w: w.sum() - 1},)
     else:
@@ -441,7 +441,7 @@ def get_annualized_cov_matrix(ticker_list, start="2023-01-01", end=None, lambda_
             df = yf.download(ticker, start=start, end=end, progress=False)[['Close']]
             price_df[ticker] = df['Close']
         except Exception as e:
-            print(f"⚠️ {ticker} 다운로드 실패: {e}")
+            print(f" {ticker} 다운로드 실패: {e}")
 
     returns = np.log(price_df / price_df.shift(1)).dropna()
 
@@ -467,7 +467,7 @@ def get_annualized_cov_matrix(ticker_list, start="2023-01-01", end=None, lambda_
 
 cov_matrix = get_annualized_cov_matrix(all_ticker, start="2023-01-01")
 
-print("📊 연율화 공분산 행렬 (EWMA 기반):")
+print(" 연율화 공분산 행렬 (EWMA 기반):")
 print(cov_matrix)
 
 
@@ -594,7 +594,7 @@ for etf in exticker:
         })
 
     except Exception as e:
-        print(f"⚠️ {etf} 처리 실패: {e}")
+        print(f" {etf} 처리 실패: {e}")
 
 # 결과 출력
 exmu_df = pd.DataFrame(exmu_result)
@@ -614,32 +614,32 @@ foreign_mu = exmu_df.set_index('ETF')['Expected Return (%)'] / 100  # 소수로
 # 3. 티커명 통일
 kr_mu.index = [f"{code}" for code in kr_mu.index]
 
-# ✅ 금 (commodity) 기대수익률 추정 전용 기간 설정
+#  금 (commodity) 기대수익률 추정 전용 기간 설정
 comm_end_date = datetime.today()
 comm_start_date = comm_end_date - timedelta(days=365 * 15)  # 최대한 길게
 
-# ✅ 데이터 수집
+#  데이터 수집
 gld_price = yf.download('GLD', start=comm_start_date, end=comm_end_date, interval='1mo')['Close']
 fx_price = yf.download('KRW=X', start=comm_start_date, end=comm_end_date, interval='1mo')['Close']
 fx_price[fx_price['KRW=X'] <= 1] = fx_price[fx_price['KRW=X'] <= 1]*10000
 
 
-# ✅ 병합 및 정리
+#  병합 및 정리
 comm_df = pd.concat([gld_price, fx_price], axis=1).dropna()
 comm_df.columns = ['GLD', 'FX']
 
-# ✅ 환노출 금 가격 계산
+#  환노출 금 가격 계산
 comm_df['KRW_GOLD'] = comm_df['GLD'] * comm_df['FX']
 comm_df['log_return'] = np.log(comm_df['KRW_GOLD'] / comm_df['KRW_GOLD'].shift(1))
 comm_df = comm_df.dropna()
 
-# ✅ ARIMA 예측 기반 기대수익률 산출
+#  ARIMA 예측 기반 기대수익률 산출
 model = ARIMA(comm_df['log_return'], order=(1, 0, 1))
 result = model.fit()
 forecast = result.get_forecast(steps=1).predicted_mean  
 
 expected_annual_return = (forecast.mean() * 12) - rf  # 월수익률 → 연환산
-print(f"📈 환노출 금 기대수익률 (ARIMA 기반): {expected_annual_return:.4%}")
+print(f" 환노출 금 기대수익률 (ARIMA 기반): {expected_annual_return:.4%}")
 
 # 3. 원자재 ETF 기대수익률 (역사적 평균)
 comm_mu = pd.Series({'411060.KS': expected_annual_return})
@@ -678,10 +678,10 @@ mu_named = mu.rename(index=etf_name_map)
 kelly_named = kelly_weights.rename(index=etf_name_map)
 
 
-print("📈 기대수익률 (mu):")
+print(" 기대수익률 (mu):")
 print(mu_named.sort_values(ascending=False).apply(lambda x: f"{x:.2%}"))
 
-print("\n🧮 켈리 최적 비중:")
+print("\n 켈리 최적 비중:")
 print(kelly_named.sort_values(ascending=False).apply(lambda x: f"{x:.2%}"))
 
 
