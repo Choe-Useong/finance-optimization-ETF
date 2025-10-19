@@ -52,7 +52,7 @@ $$r_{ETF} = \sum_{i}^{}w_{i} \cdot r_{i}$$
 
 편입 비중 정의:
 
-$$w_{i} = \frac{\text{종목 i의 편입 비율(\%)}}{100}$$
+$$w_{i} = \frac{\text{종목 i의 편입 비율}}{100}$$
 
 ### 4. 공분산 추정: EWMA 방식
 
@@ -128,7 +128,7 @@ $$r_{\text{ETF}} = r_{f} + \beta_{m}\, \mathbb{E}\left[r_{\text{Market}} - r_{f}
 - **GLD 가격**과 **KRW/USD 환율**을 월간 단위로 15년치 데이터 수집
 - 두 데이터를 병합하여, 실제 원화 기준 금 가격 시계열을 생성:
 
-$$\text{KRW\_GOLD}_{t} = \text{GLD}_{t} \times \text{FX}_{t}$$
+$$\mathrm{KRW}_{\mathrm{GOLD},\, t} = \mathrm{GLD}_{t} \times \mathrm{FX}_{t}$$
 
 ### 2. 로그 수익률 및 예측
 
