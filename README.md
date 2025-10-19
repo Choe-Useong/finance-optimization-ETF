@@ -1,3 +1,6 @@
+# ETF 포트폴리오 최적화
+
+본 문서에서는 개별 종목과 ETF의 기대수익률을 계량적으로 추정하여 투자 포트폴리오를 최적화하는 전체 과정에 대한 설명이다.
 
 ### 1. 요구수익률 개념
 
@@ -57,7 +60,7 @@ Exponentially Weighted Moving Average(EWMA)를 사용하여 최근 수익률에 
 
 로그 수익률:
 
-$$r_{t} = log\left( \frac{P_{t}}{P_{t - 1}} \right)$$
+$$r_{t} = \ln\left( \frac{P_{t}}{P_{t - 1}} \right)$$
 
 EWMA 공분산:
 
@@ -79,7 +82,7 @@ $$\mu_{excess} = r_{ETF} - r_{f}$$
 
 $$\text{Cash Yield}_{TTM} = \frac{\text{배당금}_{12M} + \text{자사주매입}_{12M}}{\text{시가총액}}$$
 
-이 값은 Trailing 12개월 기준으로, 시장 전체 주주에게 실제 지급된 현금 흐름의 수익률을 의미하며, 이를 첫 해 현금흐름(FCFE_1)로 설정하고, 이후 일정 성장률을 가정하여 DCF를 구성한다.
+이 값은 Trailing 12개월 기준으로, 시장 전체 주주에게 실제 지급된 현금 흐름의 수익률을 의미하며, 이를 첫 해 현금흐름($FCFE_{1}$)로 설정하고, 이후 일정 성장률을 가정하여 DCF를 구성한다.
 
 DCF 수식 구조는 다음과 같다:
 
@@ -89,7 +92,7 @@ $$\text{Index Level} = \sum_{t = 1}^{N}\frac{FCFE_{t}}{(1 + r)^{t}} + \frac{FCFE
 
 $$\text{Implied ERP} = r - r_{f}$$
 
-으로 계산한다. 여기서 r_f는 해당 국가의 무위험 수익률(미국은 10년 국채 수익률 기준)을 사용하였다.
+으로 계산한다. 여기서 $r_{f}$는 해당 국가의 무위험 수익률(미국은 10년 국채 수익률 기준)을 사용하였다.
 
 미국 외 해외 국가 위험 프리미엄 계산:
 
@@ -105,7 +108,7 @@ $$r_{ETF(해외)} = r_{f} + \beta_{m}(r_{\text{Market}} - r_{f})$$
 
 해외 ETF가 완전 환헤지가 아닐 경우, 환율효과를 통제하여 기대수익률을 구한다.
 
-$$r_{\text{ETF}} = r_{f} + \beta_{m}\mathbb{\cdot E\lbrack}r_{\text{Market}} - r_{f}\rbrack + \beta_{f} \cdot r_{\text{FX}}$$
+$$r_{\text{ETF}} = r_{f} + \beta_{m}\, \mathbb{E}\left[r_{\text{Market}} - r_{f}\right] + \beta_{f} \cdot r_{\text{FX}}$$
 
 #### 구성 요소 설명
 
@@ -131,18 +134,18 @@ $$\text{KRW\_GOLD}_{t} = \text{GLD}_{t} \times \text{FX}_{t}$$
 
 - 로그 수익률은 다음과 같이 계산하였다:
 
-$$r_{t} = ln\left( \frac{\text{KRW\_GOLD}_{t}}{\text{KRW\_GOLD}_{t - 1}} \right)$$
+$$r_{t} = \ln\left( \frac{\text{KRW\_GOLD}_{t}}{\text{KRW\_GOLD}_{t - 1}} \right)$$
 
 - 생성된 월간 수익률 시계열에 대해 ARMA(1,1) 모델을 적합시켜, 다음 달 수익률을 예측하였다.
 - 예측된 월간 기대수익률을 연율화한 후, 무위험수익률을 차감하여 초과 기대수익률을 추정하였다:
 
-$$\mathbb{E\lbrack}r_{\text{gold}}\rbrack = 12 \cdot {\widehat{r}}_{\text{next month}} - r_{f}$$
+$$\mathbb{E}\left[r_{\text{gold}}\right] = 12 \cdot {\widehat{r}}_{\text{next month}} - r_{f}$$
 
 ### 7. Kelly 기준 포트폴리오 최적화
 
 Kelly 최적화로 기대 로그 효용을 최대화하는 포트폴리오 비중을 결정한다. 비중의 과도한 편중을 막기 위해 릿지 패널티를 적용한다. 패널티는 기본 0.1로 설정한다.
 
-$$\max_{\mathbf{w}}\left\lbrack \mathbf{w}^{\top}\mu^{\text{excess}} - \frac{1}{2}\mathbf{w}^{\top}\Sigma\mathbf{w} \right\rbrack - \lambda \parallel \mathbf{w} \parallel^{2}$$
+$$\max_{\mathbf{w}}\left[ \mathbf{w}^{\top}\mu^{\text{excess}} - \frac{1}{2}\mathbf{w}^{\top}\Sigma\mathbf{w} \right] - \lambda \parallel \mathbf{w} \parallel^{2}$$
 
 - 제약 조건
 
@@ -152,6 +155,7 @@ $$\max_{\mathbf{w}}\left\lbrack \mathbf{w}^{\top}\mu^{\text{excess}} - \frac{1}{
 
 기대수익률·공분산 추정치의 불확실성과 자산의 꼬리 위험을 고려하여 최종적으로는 비중에 1/2을 곱한 하프켈리를 사용한다.
 
-$$\mathbf{w}^{half}\mathbf{\  =}\frac{\mathbf{1}}{\mathbf{2}}\mathbf{*w}$$
+$$\mathbf{w}^{\text{half}} = \tfrac{1}{2}\mathbf{w}$$
 
 산출된 비중의 합의 나머지 비중은 국고채3년을 할당한다.
+
