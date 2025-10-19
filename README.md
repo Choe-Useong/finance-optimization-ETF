@@ -134,7 +134,7 @@ $$\text{KRW\_GOLD}_{t} = \text{GLD}_{t} \times \text{FX}_{t}$$
 
 - 로그 수익률은 다음과 같이 계산하였다:
 
-$$r_{t} = \ln\left( \frac{\text{KRW\_GOLD}_{t}}{\text{KRW\_GOLD}_{t - 1}} \right)$$
+$$r_{t} = \ln\left( \frac{\mathrm{KRW}_{\mathrm{GOLD},\, t}}{\mathrm{KRW}_{\mathrm{GOLD},\, t-1}} \right)$$
 
 - 생성된 월간 수익률 시계열에 대해 ARMA(1,1) 모델을 적합시켜, 다음 달 수익률을 예측하였다.
 - 예측된 월간 기대수익률을 연율화한 후, 무위험수익률을 차감하여 초과 기대수익률을 추정하였다:
@@ -158,4 +158,3 @@ $$\max_{\mathbf{w}}\left[ \mathbf{w}^{\top}\mu^{\text{excess}} - \frac{1}{2}\mat
 $$\mathbf{w}^{\text{half}} = \tfrac{1}{2}\mathbf{w}$$
 
 산출된 비중의 합의 나머지 비중은 국고채3년을 할당한다.
-
