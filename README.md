@@ -76,7 +76,7 @@ $$\Sigma_{annual} = 252 \times \Sigma_{t}$$
 
 $$\mu_{excess} = r_{ETF} - r_{f}$$
 
-### 6. 해외 시장 기대수익률 {#해외-시장-기대수익률-1}
+### 6. 해외 시장 기대수익률
 
 해외 시장 지수에는 Damodaran의 Implied Equity Risk Premium(ERP) 방식으로 추정된 $r$을 사용합니다. 해당 방식은 실현된 현금흐름(FCFE)을 바탕으로 기대수익률을 역산합니다.
 
